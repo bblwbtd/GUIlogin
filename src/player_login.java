@@ -29,12 +29,10 @@ public class player_login implements Listener {
         this.m = m;
     }
 
-
-
-
     @EventHandler
     public void force_to_login(PlayerMoveEvent e){
-        if (!onlinelist.contains(e.getPlayer())){
+
+        if (!onlinelist.contains(e.getPlayer())&&e.getPlayer().isOnGround()){
             e.setCancelled(true);
             Player p = e.getPlayer();
             Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
@@ -59,7 +57,10 @@ public class player_login implements Listener {
     public void delete_leave_player(PlayerQuitEvent e){
         onlinelist.remove(e.getPlayer());
     }
-
+    @EventHandler
+    public void protect_login_player(PlayerLoginEvent e){
+        e.getPlayer().setInvulnerable(true);
+    }
     @EventHandler
     public void inventory_click_event(InventoryClickEvent e){
         if (e.getClickedInventory().getName().equals("登录")){
@@ -83,6 +84,7 @@ public class player_login implements Listener {
                 }
                 onlinelist.add((Player)e.getWhoClicked());
                 e.getWhoClicked().closeInventory();
+                e.getWhoClicked().setInvulnerable(false);
             }
 
             if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)&&cursor > 34){
