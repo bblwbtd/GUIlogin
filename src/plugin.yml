@@ -1,0 +1,7 @@
+name: GUIlogin
+main: Main
+version: 0.1
+commands:
+  open:
+    description: nothing
+    usage: /hello
