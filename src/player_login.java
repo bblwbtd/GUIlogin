@@ -31,12 +31,6 @@ public class player_login implements Listener {
 
 
 
-    @EventHandler
-    public void click_to_login(PlayerLoginEvent e){
-
-
-    }
-
 
     @EventHandler
     public void force_to_login(PlayerMoveEvent e){
@@ -61,6 +55,10 @@ public class player_login implements Listener {
         }
 
     }
+    @EventHandler
+    public void delete_leave_player(PlayerQuitEvent e){
+        onlinelist.remove(e.getPlayer());
+    }
 
     @EventHandler
     public void inventory_click_event(InventoryClickEvent e){
@@ -79,12 +77,12 @@ public class player_login implements Listener {
                     try{
                         password.append(e.getClickedInventory().getItem(a).getAmount());
                     }catch (Exception ignored){
-                        //异常处理不会整
+                        //idk how to deal with the exception.
                     }
 
                 }
-                System.out.println(password);
-
+                onlinelist.add((Player)e.getWhoClicked());
+                e.getWhoClicked().closeInventory();
             }
 
             if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)&&cursor > 34){
