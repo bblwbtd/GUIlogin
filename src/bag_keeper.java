@@ -9,6 +9,7 @@ public class bag_keeper {
 
     public void keep_items(Player player){
         storehouse.add(new item_container(player));
+
     }
     public ItemStack[] get_back(Player player){
         for (item_container container:storehouse) {

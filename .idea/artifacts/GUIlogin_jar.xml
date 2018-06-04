@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="GUIlogin:jar">
+    <output-path>$USER_HOME$/spigot/plugins</output-path>
+    <root id="archive" name="GUIlogin.jar">
+      <element id="module-output" name="GUIlogin" />
+    </root>
+  </artifact>
+</component>
