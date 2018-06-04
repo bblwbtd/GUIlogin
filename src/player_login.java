@@ -1,8 +1,5 @@
 import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -22,48 +19,54 @@ import javax.jws.HandlerChain;
 import java.util.ArrayList;
 
 public class player_login implements Listener {
-    Main m;
-    ArrayList<Player> onlinelist = new ArrayList<>();
-
-    public player_login(Main m){
+    private Main m;
+    private ArrayList<Player> onlinelist = new ArrayList<>();
+    player_login(Main m){
         this.m = m;
     }
+    private bag_keeper keeper = new bag_keeper();
 
     @EventHandler
     public void force_to_login(PlayerMoveEvent e){
-
         if (!onlinelist.contains(e.getPlayer())&&e.getPlayer().isOnGround()){
             e.setCancelled(true);
-            Player p = e.getPlayer();
-            Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
-            p.openInventory(inv);
-            inv.setItem(0, new ItemStack(Material.STONE_BUTTON, 1));
-            inv.setItem(1, new ItemStack(Material.STONE_BUTTON, 2));
-            inv.setItem(2, new ItemStack(Material.STONE_BUTTON, 3));
-            inv.setItem(9, new ItemStack(Material.STONE_BUTTON, 4));
-            inv.setItem(10, new ItemStack(Material.STONE_BUTTON, 5));
-            inv.setItem(11, new ItemStack(Material.STONE_BUTTON, 6));
-            inv.setItem(18, new ItemStack(Material.STONE_BUTTON, 7));
-            inv.setItem(19, new ItemStack(Material.STONE_BUTTON, 8));
-            inv.setItem(20, new ItemStack(Material.STONE_BUTTON, 9));
-            inv.setItem(27, new ItemStack(Material.EMERALD_BLOCK, 1));
-            inv.setItem(28, new ItemStack(Material.REDSTONE_BLOCK, 1));
-            inv.setItem(29, new ItemStack(Material.GLASS,1));
-            inv.setItem(14, new ItemStack(Material.WHITE_GLAZED_TERRACOTTA, 35));
+            show_login_gui(e.getPlayer());
         }
 
     }
+    private void show_login_gui(Player player){
+        Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
+        player.openInventory(inv);
+        inv.setItem(0, new ItemStack(Material.STONE_BUTTON, 1));
+        inv.setItem(1, new ItemStack(Material.STONE_BUTTON, 2));
+        inv.setItem(2, new ItemStack(Material.STONE_BUTTON, 3));
+        inv.setItem(9, new ItemStack(Material.STONE_BUTTON, 4));
+        inv.setItem(10, new ItemStack(Material.STONE_BUTTON, 5));
+        inv.setItem(11, new ItemStack(Material.STONE_BUTTON, 6));
+        inv.setItem(18, new ItemStack(Material.STONE_BUTTON, 7));
+        inv.setItem(19, new ItemStack(Material.STONE_BUTTON, 8));
+        inv.setItem(20, new ItemStack(Material.STONE_BUTTON, 9));
+        inv.setItem(27, new ItemStack(Material.EMERALD_BLOCK, 1));
+        inv.setItem(28, new ItemStack(Material.REDSTONE_BLOCK, 1));
+        inv.setItem(29, new ItemStack(Material.GLASS,1));
+        inv.setItem(14, new ItemStack(Material.SNOW_BLOCK, 35));
+    }
+
     @EventHandler
     public void delete_leave_player(PlayerQuitEvent e){
         onlinelist.remove(e.getPlayer());
     }
     @EventHandler
     public void protect_login_player(PlayerLoginEvent e){
+        Player player = e.getPlayer();
+        keeper.keep_items(player);
+        player.getInventory().clear();
         e.getPlayer().setInvulnerable(true);
     }
     @EventHandler
     public void inventory_click_event(InventoryClickEvent e){
         if (e.getClickedInventory().getName().equals("登录")){
+            Player player = (Player)e.getWhoClicked();
             int cursor = e.getClickedInventory().getItem(14).getAmount();
             if (e.getCurrentItem().getType().equals(Material.STONE_BUTTON)&&cursor<53){
                 ItemStack itemStack = e.getCurrentItem();
@@ -82,9 +85,8 @@ public class player_login implements Listener {
                     }
 
                 }
-                onlinelist.add((Player)e.getWhoClicked());
-                e.getWhoClicked().closeInventory();
-                e.getWhoClicked().setInvulnerable(false);
+                onlinelist.add (player);
+                player.getInventory().setContents(keeper.get_back(player));
             }
 
             if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)&&cursor > 34){
@@ -101,9 +103,9 @@ public class player_login implements Listener {
                 for(int a = 35;a<54;a++){
                     try{
                         e.getClickedInventory().setItem(a,new ItemStack(Material.AIR,1));
-                        e.getClickedInventory().setItem(14, new ItemStack(Material.WHITE_GLAZED_TERRACOTTA, 35));
+                        e.getClickedInventory().setItem(14, new ItemStack(Material.SNOW_BLOCK, 35));
                     }catch (Exception ignored){
-                        //异常处理不会整
+
                     }
 
                 }
@@ -113,6 +115,6 @@ public class player_login implements Listener {
         }
 
     }
-
-
 }
+
+
