@@ -1,4 +1,4 @@
-package group.ldgame.showGUI;
+package group.ldgame.shouGUI;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -89,10 +89,7 @@ public class player_login implements Listener {
                     this.cancel();
                 }
             }.runTaskTimer(main,1,-1);
-
         }
-
-
     }
 
     @EventHandler

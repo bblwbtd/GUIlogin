@@ -1,10 +1,10 @@
-package group.ldgame.showGUI;
-
-import group.ldgame.showGUI.Main;
+package group.ldgame.shouGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import group.ldgame.shouGUI.Main;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -1,4 +1,4 @@
-package group.ldgame.showGUI;
+package group.ldgame.shouGUI;
 
 
 import org.bukkit.plugin.java.JavaPlugin;
