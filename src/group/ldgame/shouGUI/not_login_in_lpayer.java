@@ -1,3 +1,5 @@
+package group.ldgame.shouGUI;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -12,7 +14,7 @@ public class not_login_in_lpayer {
     private boolean login_statue = false;
     private Timer timer = new Timer();
     private Player player;
-    public not_login_in_lpayer(Player p,Main main){
+    public not_login_in_lpayer(Player p, Main main){
         player = p;
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override

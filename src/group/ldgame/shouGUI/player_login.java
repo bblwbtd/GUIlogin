@@ -1,6 +1,9 @@
+package group.ldgame.shouGUI;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,10 +20,13 @@ import java.util.List;
 public class player_login implements Listener {
     private Main main;
     private ArrayList<Player> onlinelist = new ArrayList<>();
-    player_login(Main m){
+    public player_login(Main m){
         this.main = m;
     }
     private ArrayList<not_login_in_lpayer> waitlist = new ArrayList<>();
+
+
+
     @EventHandler
     public void avoid_move(PlayerMoveEvent e){
         if(!onlinelist.contains(e.getPlayer())){
@@ -67,11 +73,20 @@ public class player_login implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
+
                     show_login_gui(player);
                     this.cancel();
                 }
             }.runTaskTimer(main,1,-1);
         }else {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+
+                    show_chose_gui(e.getPlayer());
+                    this.cancel();
+                }
+            }.runTaskTimer(main,1,-1);
 
         }
 
@@ -167,10 +182,12 @@ public class player_login implements Listener {
 
     }
     private void show_chose_gui(Player player){
-        Inventory inv = Bukkit.createInventory(null, 3 * 9,"欢迎新玩家"+player.getName()+"!");
+        Inventory inv = Bukkit.createInventory(null, 9,"欢迎新玩家"+player.getName()+"!");
         player.openInventory(inv);
-        inv.setItem(12, setMeta(new ItemStack(Material.PAPER, 1),"注册"));
-        inv.setItem(14, setMeta(new ItemStack(Material.WOOD_SWORD, 1),"试玩"));
+
+        inv.setItem(3, setMeta(new ItemStack(Material.BOOK_AND_QUILL, 1),ChatColor.GREEN+"注册"));
+        inv.setItem(3, setMeta(new ItemStack(Material.WOOD_SWORD, 1), ChatColor.YELLOW + "试玩"));
+
     }
     private void show_login_gui(Player player){
         Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
@@ -213,6 +230,7 @@ public class player_login implements Listener {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(name);
         itemMeta.setLore(lore);
+
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }

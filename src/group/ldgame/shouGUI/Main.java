@@ -1,3 +1,6 @@
+package group.ldgame.shouGUI;
+
+import group.ldgame.shouGUI.player_login;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
