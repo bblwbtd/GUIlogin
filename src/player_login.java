@@ -42,7 +42,7 @@ public class player_login implements Listener {
         }
     }
     @EventHandler
-    public void avoid_close_GUI(InventoryCloseEvent e){
+    public void avoid_close_gui(InventoryCloseEvent e){
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -76,24 +76,29 @@ public class player_login implements Listener {
     public void onjoin(PlayerLoginEvent e){
         Player player = e.getPlayer();
         e.getPlayer().setInvulnerable(true);
+        if (e.getPlayer().hasPlayedBefore()){
+            waitlist.add(new not_login_in_lpayer(player,main));
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    show_login_gui(player);
+                    this.cancel();
+                }
+            }.runTaskTimer(main,1,-1);
+        }else {
 
-        waitlist.add(new not_login_in_lpayer(player,main));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                show_login_gui(player);
-                this.cancel();
-            }
-        }.runTaskTimer(main,1,-1);
+        }
+
 
     }
 
     @EventHandler
     public void inventory_click_event(InventoryClickEvent e){
         try{
+            Player player = (Player)e.getWhoClicked();
+
             if (e.getClickedInventory().getName().equals("登录")){
                 e.setCancelled(true);
-                Player player = (Player)e.getWhoClicked();
                 not_login_in_lpayer player1 = null;
                 for (not_login_in_lpayer n:waitlist) {
                     if (n.getPlayer().equals(player)){
@@ -101,6 +106,7 @@ public class player_login implements Listener {
                         break;
                     }
                 }
+
 
                 //number button
                 assert player1 != null;
@@ -145,19 +151,40 @@ public class player_login implements Listener {
                         }
 
                     }
-                    onlinelist.add (player);
-                    player.getOpenInventory().close();
-                    player1.setLogin_statue(true);
-                    waitlist.remove(player1);
-                    ((Player) e.getWhoClicked()).sendTitle(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!");
+                    login_success(player,player1);
                 }
 
 
+            }else if(e.getClickedInventory().getName().equals("欢迎新玩家"+e.getWhoClicked().getName()+"!")){
+                if(e.getCurrentItem().getItemMeta().getDisplayName().equals("试玩")){
+                    onlinelist.add((Player)e.getWhoClicked());
+                    login_success((Player) e.getWhoClicked());
+                    e.setCancelled(true);
+                }
             }
         }catch (Exception ignored){
 
         }
 
+    }
+    private void login_success(Player player){
+        onlinelist.add (player);
+        player.getOpenInventory().close();
+        player.sendTitle(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!");
+    }
+    private void login_success(Player player,not_login_in_lpayer player1){
+        onlinelist.add (player);
+        player.getOpenInventory().close();
+        player1.setLogin_statue(true);
+        waitlist.remove(player1);
+        player.sendTitle(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!");
+
+    }
+    private void show_chose_gui(Player player){
+        Inventory inv = Bukkit.createInventory(null, 3 * 9,"欢迎新玩家"+player.getName()+"!");
+        player.openInventory(inv);
+        inv.setItem(12, setMeta(new ItemStack(Material.PAPER, 1),"注册"));
+        inv.setItem(14, setMeta(new ItemStack(Material.WOOD_SWORD, 1),"试玩"));
     }
     private void show_login_gui(Player player){
         Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
@@ -176,6 +203,22 @@ public class player_login implements Listener {
         inv.setItem(28, setMeta(new ItemStack(Material.REDSTONE_BLOCK, 1),ChatColor.RED+"撤销"));
         inv.setItem(29, setMeta(new ItemStack(Material.GLASS, 1),"清空"));
 
+    }
+    private void show_register_gui(Player player){
+        Inventory inv = Bukkit.createInventory(null, 6 * 9,"注册");
+        player.openInventory(inv);
+        inv.setItem(0, setMeta(new ItemStack(Material.STONE_BUTTON, 1),"1"));
+        inv.setItem(1, setMeta(new ItemStack(Material.STONE_BUTTON, 2),"2"));
+        inv.setItem(2, setMeta(new ItemStack(Material.STONE_BUTTON, 3),"3"));
+        inv.setItem(9, setMeta(new ItemStack(Material.STONE_BUTTON, 4),"4"));
+        inv.setItem(10, setMeta(new ItemStack(Material.STONE_BUTTON, 5),"5"));
+        inv.setItem(11, setMeta(new ItemStack(Material.STONE_BUTTON, 6),"6"));
+        inv.setItem(18, setMeta(new ItemStack(Material.STONE_BUTTON, 7),"7"));
+        inv.setItem(19, setMeta(new ItemStack(Material.STONE_BUTTON, 8),"8"));
+        inv.setItem(20, setMeta(new ItemStack(Material.STONE_BUTTON, 9),"9"));
+        inv.setItem(27, setMeta(new ItemStack(Material.EMERALD_BLOCK, 1),ChatColor.GREEN+"确认"));
+        inv.setItem(28, setMeta(new ItemStack(Material.REDSTONE_BLOCK, 1),ChatColor.RED+"撤销"));
+        inv.setItem(29, setMeta(new ItemStack(Material.GLASS, 1),"清空"));
     }
     private ItemStack setMeta(ItemStack itemStack,String name,List<String> lore){
         if (((itemStack == null)||itemStack.getType() == Material.AIR )){
