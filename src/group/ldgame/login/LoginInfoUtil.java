@@ -1,6 +1,7 @@
 package group.ldgame.login;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -40,5 +41,11 @@ public class LoginInfoUtil {
 		
 		//存取玩家登录信息
 		fc.set(playerName+".pwEncrypt", pwEncrypt);
+		
+		try {
+			fc.save(pwFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

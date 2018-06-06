@@ -80,7 +80,7 @@ public class PlayerLoginListener implements Listener {
 	 * 注册玩家跳转至登录界面
 	 */
 	@EventHandler
-	public void onjoin(PlayerLoginEvent e) {
+	public void onJoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
         e.getPlayer().setInvulnerable(true);
         
@@ -88,7 +88,7 @@ public class PlayerLoginListener implements Listener {
         playerLoginInfo = LoginInfoUtil.getPlayerLoginInfo(playerName);
         
         //判断登录信息中的pwEncrypt是否不为空，若不为空，说明玩家已注册
-        if(!playerLoginInfo.get("pwEncrypt").equals(null)) {
+        if(!playerLoginInfo.get("pwEncrypt").equals("")) {
         	isRegister = true;
         }
         
