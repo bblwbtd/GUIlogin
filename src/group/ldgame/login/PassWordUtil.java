@@ -6,8 +6,8 @@ public class PassWordUtil {
 	 * 密码验证方法
 	 */
 	public static boolean pwCheck(String inputPw,String hashedPw) {
-		System.out.println(inputPw);
-		System.out.println(hashedPw);
+//		System.out.println(inputPw);
+//		System.out.println(hashedPw);
 		if (BCrypt.checkpw(inputPw, hashedPw)) {
 			return true;
 		}else {

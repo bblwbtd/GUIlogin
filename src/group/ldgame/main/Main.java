@@ -13,14 +13,17 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerLoginListener(this),this);
-        
-		File pwFile = new File("plugins/GUIlogin/login.yml");
 		try {
+            File pwFile = new File("plugins/GUIlogin/");
 			if(!pwFile.exists()) {
-				pwFile.createNewFile();
-			}	
-		} catch (IOException e) {
-			e.printStackTrace();
+                pwFile.mkdir();
+                pwFile = new File("plugins/GUIlogin/login.yml");
+                if(!pwFile.exists()){
+                    pwFile.createNewFile();
+                }
+			}
+        } catch (IOException e) {
+            e.printStackTrace();
 		}
 		
         System.out.println("Ready to work");

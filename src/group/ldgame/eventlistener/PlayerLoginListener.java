@@ -202,8 +202,8 @@ public class PlayerLoginListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                        showRegisterGUI(player);
-                        this.cancel();
+                            showRegisterGUI(player);
+                            this.cancel();
                         }
                     }.runTaskTimer(main,1,-1);
 
