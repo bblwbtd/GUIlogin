@@ -45,13 +45,19 @@ public class PlayerLoginListener implements Listener {
 
 	@EventHandler
 	public void avoidCloseGUI(InventoryCloseEvent e) {
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+
 				if (e.getInventory().getName().equals("登录") && !onlinelist.contains((Player) e.getPlayer())) {
 					e.getPlayer().openInventory(e.getInventory());
-					this.cancel();
-				}
+                    this.cancel();
+				}else if(e.getInventory().getName().equals("注册") && !onlinelist.contains((Player) e.getPlayer())) {
+                    showChoseGUI((Player) e.getPlayer());
+                    this.cancel();
+                }
+
 			}
 		}.runTaskTimer(main, 1, 0);
 	}
@@ -252,7 +258,7 @@ public class PlayerLoginListener implements Listener {
                         }
                     }
                     LoginInfoUtil.registerPlayerInfo(playerName, password.toString());
-
+                    player.closeInventory();
                 }
 
             }
