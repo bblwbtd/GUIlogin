@@ -17,7 +17,7 @@ public class PassWordUtil {
 	
 	/*
 	 * 加密方法，用户第一次设定密码的时候会调用
-	 * 
+	 * 返回加密后的密码信息
 	 */
 	public static String pwEncrypt(String pw) {
 		String hashed = BCrypt.hashpw(pw,BCrypt.gensalt());

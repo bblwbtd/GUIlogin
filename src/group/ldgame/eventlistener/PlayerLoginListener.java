@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.destroystokyo.paper.Title;
 import group.ldgame.login.LoginInfoUtil;
 import group.ldgame.login.PassWordUtil;
 import group.ldgame.main.Main;
@@ -29,6 +30,7 @@ public class PlayerLoginListener implements Listener {
 	private String playerName;
 	private TreeMap<String, String> playerLoginInfo;
 	private ArrayList<NotLoginInPlayer> waitlist = new ArrayList<>();
+	private boolean isRegister = false;
 
 	public PlayerLoginListener(Main m) {
 		this.main = m;
@@ -72,13 +74,26 @@ public class PlayerLoginListener implements Listener {
 	public void deleteLeavePlayer(PlayerQuitEvent e) {
 		onlinelist.remove(e.getPlayer());
 	}
-
+	/*
+	 * 判断玩家之前是否已注册
+	 * 未注册玩家跳转至注册、试玩选择界面
+	 * 注册玩家跳转至登录界面
+	 */
 	@EventHandler
 	public void onjoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
         e.getPlayer().setInvulnerable(true);
-        //判断玩家之前是否有玩过,但目前hasPlayedBefore()不知为什么没有用,一直是false,所以需要在数据库查找这个玩家是否有密码.
-        if (true){
+        
+        playerName = player.getPlayer().getName();
+        playerLoginInfo = LoginInfoUtil.getPlayerLoginInfo(playerName);
+        
+        //判断登录信息中的pwEncrypt是否不为空，若不为空，说明玩家已注册
+        if(!playerLoginInfo.get("pwEncrypt").equals(null)) {
+        	isRegister = true;
+        }
+        
+        //跳转界面判定
+        if (isRegister){
             waitlist.add(new NotLoginInPlayer(player,main));
             new BukkitRunnable() {
                 @Override
@@ -99,7 +114,7 @@ public class PlayerLoginListener implements Listener {
 	}
 
 	@EventHandler
-	public void inventory_click_event(InventoryClickEvent e) {
+	public void inventoryClickEvent(InventoryClickEvent e) {
 		try{
             Player player = (Player)e.getWhoClicked();
 
@@ -167,7 +182,7 @@ public class PlayerLoginListener implements Listener {
 
                     }else {
 
-       //                 e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
+                    	e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
                         System.out.println("登录失败");
                         //密码输入错误的场合
                     }
@@ -187,7 +202,7 @@ public class PlayerLoginListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                        show_register_gui(player);
+                        showRegisterGUI(player);
                         this.cancel();
                         }
                     }.runTaskTimer(main,1,-1);
@@ -233,10 +248,10 @@ public class PlayerLoginListener implements Listener {
                         try{
                             password.append(e.getClickedInventory().getItem(a).getAmount());
                         }catch (Exception ignored){
-                            //idk how to deal with the exception.
+                        	
                         }
-
                     }
+                    LoginInfoUtil.registerPlayerInfo(playerName, password.toString());
 
                 }
 
@@ -249,7 +264,7 @@ public class PlayerLoginListener implements Listener {
 	private void loginSuccess(Player player){
         onlinelist.add (player);
         player.getOpenInventory().close();
-        player.sendTitle(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!");
+        player.sendTitle(new Title(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!"));
     }
 	
 	private void loginSuccess(Player player,NotLoginInPlayer player1){
@@ -257,7 +272,7 @@ public class PlayerLoginListener implements Listener {
         player.getOpenInventory().close();
         player1.setLogin_statue(true);
         waitlist.remove(player1);
-        player.sendTitle(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!");
+        player.sendTitle(new Title(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!"));
 
     }
 	
@@ -272,8 +287,6 @@ public class PlayerLoginListener implements Listener {
 	
 
 	public void showLoginGUI(Player player) {
-		playerName = player.getPlayer().getName();
-		playerLoginInfo = LoginInfoUtil.getPlayerLoginInfo(playerName);
 		Inventory inv = Bukkit.createInventory(null, 6 * 9,"登录");
         player.openInventory(inv);
 
@@ -292,7 +305,7 @@ public class PlayerLoginListener implements Listener {
 
 	}
 	
-	private void show_register_gui(Player player){
+	private void showRegisterGUI(Player player){
         Inventory inv = Bukkit.createInventory(null, 6 * 9,"注册");
         player.openInventory(inv);
         inv.setItem(0, setMeta(new ItemStack(Material.STONE_BUTTON, 1),"1"));
@@ -308,6 +321,7 @@ public class PlayerLoginListener implements Listener {
         inv.setItem(28, setMeta(new ItemStack(Material.REDSTONE_BLOCK, 1),ChatColor.RED+"撤销"));
         inv.setItem(29, setMeta(new ItemStack(Material.GLASS, 1),"清空"));
     }
+	
 	private ItemStack setMeta(ItemStack itemStack, String name, List<String> lore) {
 		if (((itemStack == null) || itemStack.getType() == Material.AIR)) {
 			return null;

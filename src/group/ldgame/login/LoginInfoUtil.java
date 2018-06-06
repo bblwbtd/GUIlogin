@@ -30,4 +30,15 @@ public class LoginInfoUtil {
 		
 		return playerLoginInfo;
 	}
+	
+	public static void registerPlayerInfo(String playerName,String password) {
+		//加密玩家密码
+		String pwEncrypt = PassWordUtil.pwEncrypt(password);
+		
+		File pwFile = new File("plugins/GUIlogin/login.yml");
+		FileConfiguration fc = YamlConfiguration.loadConfiguration(pwFile);
+		
+		//存取玩家登录信息
+		fc.set(playerName+".pwEncrypt", pwEncrypt);
+	}
 }
