@@ -171,13 +171,11 @@ public class PlayerLoginListener implements Listener {
 
                     if (isPass) {
                         //密码输入正确的场合
-                        System.out.println("登录成功");
                         loginSuccess(player);
                     }else {
-
-                        e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
-                        System.out.println("登录失败");
                         //密码输入错误的场合
+                        e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
+
                     }
 
                 }
@@ -246,6 +244,8 @@ public class PlayerLoginListener implements Listener {
                     }
                     LoginInfoUtil.registerPlayerInfo(playerName, password.toString());
                     player.closeInventory();
+                    onlinelist.add(player);
+                    player.sendTitle(new Title(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"注册成功!"));
                 }
 
             }
@@ -340,14 +340,12 @@ public class PlayerLoginListener implements Listener {
 
         @Override
         public void run() {
-	        System.out.println(time_left);
             if(onlinelist.contains(player)){
                 this.cancel();
             }else if(time_left < 0){
                 Bukkit.getScheduler().runTask(main, new Runnable() {
                     public void run() {
                         player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!" );
-
                     }
                 });
                 this.cancel();
