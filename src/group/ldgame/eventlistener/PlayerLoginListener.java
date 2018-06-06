@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import group.ldgame.login.LoginInfoUtil;
 import group.ldgame.login.PassWordUtil;
 import group.ldgame.main.Main;
-import group.ldgame.shouGUI.not_login_in_lpayer;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,27 +77,26 @@ public class PlayerLoginListener implements Listener {
 	public void onjoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
         e.getPlayer().setInvulnerable(true);
-        if (e.getPlayer().hasPlayedBefore()){
+        //判断玩家之前是否有玩过,但目前hasPlayedBefore()不知为什么没有用,一直是false,所以需要在数据库查找这个玩家是否有密码.
+        if (true){
             waitlist.add(new NotLoginInPlayer(player,main));
             new BukkitRunnable() {
                 @Override
                 public void run() {
-
                     showLoginGUI(player);
                     this.cancel();
                 }
             }.runTaskTimer(main,1,-1);
         }else {
             new BukkitRunnable() {
-
-	@Override
-	public void run() {
-
-		showChoseGUI(e.getPlayer());
-		this.cancel();
+            @Override
+            public void run() {
+                    showChoseGUI(e.getPlayer());
+                    this.cancel();
+                }
+            }.runTaskTimer(main,1,-1);
+        }
 	}
-
-	}.runTaskTimer(main,1,-1);}}
 
 	@EventHandler
 	public void inventory_click_event(InventoryClickEvent e) {
@@ -105,6 +104,7 @@ public class PlayerLoginListener implements Listener {
             Player player = (Player)e.getWhoClicked();
 
             if (e.getClickedInventory().getName().equals("登录")){
+                //登录界面代码
                 e.setCancelled(true);
                 NotLoginInPlayer player1 = null;
                 for (NotLoginInPlayer n:waitlist) {
@@ -158,11 +158,25 @@ public class PlayerLoginListener implements Listener {
                         }
 
                     }
-                    loginSuccess(player,player1);
+                    boolean isPass = PassWordUtil.pwCheck(password.toString(), playerLoginInfo.get("pwEncrypt"));
+
+                    if (isPass) {
+                        //密码输入正确的场合
+                        System.out.println("登录成功");
+                        loginSuccess(player,player1);
+
+                    }else {
+
+       //                 e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
+                        System.out.println("登录失败");
+                        //密码输入错误的场合
+                    }
+
                 }
 
 
             }else if(e.getClickedInventory().getName().equals("欢迎新玩家"+e.getWhoClicked().getName()+"!")){
+                //新玩家界面处理代码
                 if(e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW+"试玩")){
                     onlinelist.add((Player)e.getWhoClicked());
                     loginSuccess((Player) e.getWhoClicked());
@@ -180,6 +194,7 @@ public class PlayerLoginListener implements Listener {
 
                 }
             }else if(e.getClickedInventory().getName().equals("注册")){
+                //注册界面代码
                 e.setCancelled(true);
                 int Cursor = 36;
                 while (Cursor < 54){
@@ -191,18 +206,13 @@ public class PlayerLoginListener implements Listener {
                 if (e.getCurrentItem().getType().equals(Material.STONE_BUTTON)&&Cursor<54){
                     ItemStack itemStack = e.getCurrentItem();
                     Inventory inv = e.getClickedInventory();
-
                     inv.setItem(Cursor,new ItemStack(Material.STONE,itemStack.getAmount()));
-
                 }
 
                 //delete button
                 if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)){
                     Inventory inv = e.getClickedInventory();
                     inv.setItem(Cursor-1, new ItemStack(Material.AIR,1));
-
-
-
                 }
                 //clear button
                 if(e.getCurrentItem().getType().equals(Material.GLASS)){
@@ -227,19 +237,12 @@ public class PlayerLoginListener implements Listener {
                         }
 
                     }
-                    boolean isPass = PassWordUtil.pwCheck(password.toString(), playerLoginInfo.get("pwEncrypt"));
-                    if (isPass) {
-                		//密码输入正确的场合
-                		System.out.println("对了");
-                		loginSuccess(player);
-                	}else {
-                		//密码输入错误的场合
-                	}
+
                 }
 
             }
-        }catch (Exception ignored){
-
+        }catch (Exception a){
+            a.printStackTrace();
         }
     }
 	
@@ -267,7 +270,7 @@ public class PlayerLoginListener implements Listener {
 
     }
 	
-	@EventHandler
+
 	public void showLoginGUI(Player player) {
 		playerName = player.getPlayer().getName();
 		playerLoginInfo = LoginInfoUtil.getPlayerLoginInfo(playerName);

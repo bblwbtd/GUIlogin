@@ -1,5 +1,5 @@
 name: GUIlogin
-main: group.ldgame.showGUI.Main
+main: group.ldgame.main.Main
 version: 0.1
 commands:
   open:
