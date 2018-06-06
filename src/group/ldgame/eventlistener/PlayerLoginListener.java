@@ -29,7 +29,7 @@ public class PlayerLoginListener implements Listener {
 	private ArrayList<Player> onlinelist = new ArrayList<>();
 	private String playerName;
 	private TreeMap<String, String> playerLoginInfo;
-	private ArrayList<NotLoginInPlayer> waitlist = new ArrayList<>();
+
 	private boolean isRegister = false;
 
 	public PlayerLoginListener(Main m) {
@@ -45,19 +45,18 @@ public class PlayerLoginListener implements Listener {
 
 	@EventHandler
 	public void avoidCloseGUI(InventoryCloseEvent e) {
-
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 
 				if (e.getInventory().getName().equals("登录") && !onlinelist.contains((Player) e.getPlayer())) {
 					e.getPlayer().openInventory(e.getInventory());
-                    this.cancel();
+
 				}else if(e.getInventory().getName().equals("注册") && !onlinelist.contains((Player) e.getPlayer())) {
                     showChoseGUI((Player) e.getPlayer());
-                    this.cancel();
-                }
 
+                }
+                this.cancel();
 			}
 		}.runTaskTimer(main, 1, 0);
 	}
@@ -89,18 +88,17 @@ public class PlayerLoginListener implements Listener {
 	public void onJoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
         e.getPlayer().setInvulnerable(true);
-        
+
         playerName = player.getPlayer().getName();
         playerLoginInfo = LoginInfoUtil.getPlayerLoginInfo(playerName);
-        
         //判断登录信息中的pwEncrypt是否不为空，若不为空，说明玩家已注册
         if(!playerLoginInfo.get("pwEncrypt").equals("")) {
         	isRegister = true;
         }
-        
+        count_down c = new count_down(player);
         //跳转界面判定
         if (isRegister){
-            waitlist.add(new NotLoginInPlayer(player,main));
+            c.runTaskTimer(main,0,20);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -109,9 +107,11 @@ public class PlayerLoginListener implements Listener {
                 }
             }.runTaskTimer(main,1,-1);
         }else {
+            c.setTime_left(120);
+            c.runTaskTimer(main,0,20);
             new BukkitRunnable() {
-            @Override
-            public void run() {
+                @Override
+                public void run() {
                     showChoseGUI(e.getPlayer());
                     this.cancel();
                 }
@@ -127,41 +127,30 @@ public class PlayerLoginListener implements Listener {
             if (e.getClickedInventory().getName().equals("登录")){
                 //登录界面代码
                 e.setCancelled(true);
-                NotLoginInPlayer player1 = null;
-                for (NotLoginInPlayer n:waitlist) {
-                    if (n.getPlayer().equals(player)){
-                        player1 = n;
+                int Cursor = 36;
+                while (Cursor < 54){
+                    if(e.getClickedInventory().getItem(Cursor)==null){
                         break;
                     }
+                    Cursor++;
                 }
-
-
-                //number button
-                assert player1 != null;
-                if (e.getCurrentItem().getType().equals(Material.STONE_BUTTON)&&player1.getCusor()<54){
+                if (e.getCurrentItem().getType().equals(Material.STONE_BUTTON)&&Cursor<54){
                     ItemStack itemStack = e.getCurrentItem();
                     Inventory inv = e.getClickedInventory();
-                    player1.movecusor(1);
-                    inv.setItem(player1.getCusor(),new ItemStack(Material.STONE,itemStack.getAmount()));
-
+                    inv.setItem(Cursor,new ItemStack(Material.STONE,itemStack.getAmount()));
                 }
 
                 //delete button
-                if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)&&player1.getCusor() > 34){
+                if (e.getCurrentItem().getType().equals(Material.REDSTONE_BLOCK)){
                     Inventory inv = e.getClickedInventory();
-                    inv.setItem(player1.getCusor(), new ItemStack(Material.AIR,1));
-                    if ( player1.getCusor()>35){
-                        player1.movecusor(-1);
-                    }
-
-
+                    inv.setItem(Cursor-1, new ItemStack(Material.AIR,1));
                 }
                 //clear button
                 if(e.getCurrentItem().getType().equals(Material.GLASS)){
                     for(int a = 35;a<54;a++){
                         try{
                             e.getClickedInventory().setItem(a,new ItemStack(Material.AIR,1));
-                            player1.setCursor(35);
+
                         }catch (Exception ignored){
 
                         }
@@ -169,26 +158,24 @@ public class PlayerLoginListener implements Listener {
                     }
                 }
                 //confirm button
-                if (e.getCurrentItem().getType().equals(Material.EMERALD_BLOCK)&&player1.getCusor() > 35){
+                if (e.getCurrentItem().getType().equals(Material.EMERALD_BLOCK)&&Cursor > 35){
                     StringBuilder password = new StringBuilder();
                     for(int a = 35;a<54;a++){
                         try{
                             password.append(e.getClickedInventory().getItem(a).getAmount());
                         }catch (Exception ignored){
-                            //idk how to deal with the exception.
-                        }
 
+                        }
                     }
                     boolean isPass = PassWordUtil.pwCheck(password.toString(), playerLoginInfo.get("pwEncrypt"));
 
                     if (isPass) {
                         //密码输入正确的场合
                         System.out.println("登录成功");
-                        loginSuccess(player,player1);
-
+                        loginSuccess(player);
                     }else {
 
-                    	e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
+                        e.setCurrentItem(setMeta(e.getCurrentItem(),ChatColor.GREEN+"登录",Main.toList(ChatColor.RED+"登录失败")));
                         System.out.println("登录失败");
                         //密码输入错误的场合
                     }
@@ -254,7 +241,7 @@ public class PlayerLoginListener implements Listener {
                         try{
                             password.append(e.getClickedInventory().getItem(a).getAmount());
                         }catch (Exception ignored){
-                        	
+
                         }
                     }
                     LoginInfoUtil.registerPlayerInfo(playerName, password.toString());
@@ -272,15 +259,7 @@ public class PlayerLoginListener implements Listener {
         player.getOpenInventory().close();
         player.sendTitle(new Title(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!"));
     }
-	
-	private void loginSuccess(Player player,NotLoginInPlayer player1){
-        onlinelist.add (player);
-        player.getOpenInventory().close();
-        player1.setLogin_statue(true);
-        waitlist.remove(player1);
-        player.sendTitle(new Title(ChatColor.RED+"欢迎来到灵动MC服务器!",ChatColor.GREEN+"登录成功!"));
 
-    }
 	
 	private void showChoseGUI(Player player){
         Inventory inv = Bukkit.createInventory(null, 9,"欢迎新玩家"+player.getName()+"!");
@@ -348,5 +327,34 @@ public class PlayerLoginListener implements Listener {
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
+	private class count_down extends BukkitRunnable{
+        private int time_left = 60;
+        private Player player;
+	    count_down(Player player){
+            this.player = player;
+        }
+
+        public void setTime_left(int time_left) {
+            this.time_left = time_left;
+        }
+
+        @Override
+        public void run() {
+	        System.out.println(time_left);
+            if(onlinelist.contains(player)){
+                this.cancel();
+            }else if(time_left < 0){
+                Bukkit.getScheduler().runTask(main, new Runnable() {
+                    public void run() {
+                        player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!" );
+
+                    }
+                });
+                this.cancel();
+            }else{
+                time_left--;
+            }
+        }
+    }
 
 }
