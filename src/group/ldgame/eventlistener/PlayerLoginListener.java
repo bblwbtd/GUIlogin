@@ -35,7 +35,7 @@ public class PlayerLoginListener implements Listener {
 	private TreeMap<String, String> playerLoginInfo;
 	private boolean isRegister = false;
 	private boolean isJoined = false;
-
+	private boolean isClickReg = false;
 	public PlayerLoginListener(Main m) {
 		this.main = m;
 	}
@@ -65,7 +65,9 @@ public class PlayerLoginListener implements Listener {
 					showMenu(player, LOGIN_MENU);
 				} else if (e.getInventory().getName().equals("注册") && !isJoined && player.isOnline()) {
 					showMenu(player, REGISTER_MENU);
-
+				} else if (e.getInventory().getName().equals("欢迎新玩家" + playerName + "!") 
+						   && !isJoined && player.isOnline() && !isClickReg) {
+					showMenu(player, CHOSE_MENU);
 				}
 				this.cancel();
 			}
@@ -248,6 +250,7 @@ public class PlayerLoginListener implements Listener {
 								@Override
 								public void run() {
 									showMenu(player, REGISTER_MENU);
+									isClickReg = true;
 									this.cancel();
 								}
 							}.runTaskTimer(main, 1, -1);
@@ -297,7 +300,6 @@ public class PlayerLoginListener implements Listener {
 		}
 		// 登录界面的处理
 		if (e.getClickedInventory().getName().equals("登录")) {
-			System.out.println(playerLoginInfo);
 			boolean isPass = PassWordUtil.pwCheck(password.toString(), playerLoginInfo.get("pwEncrypt"));
 
 			if (isPass) {
