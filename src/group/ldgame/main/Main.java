@@ -13,6 +13,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerLoginListener(this),this);
+
 		try {
             File pwFile = new File("plugins/GUIlogin/");
 			if(!pwFile.exists()) {
