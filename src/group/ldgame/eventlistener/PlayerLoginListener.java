@@ -47,6 +47,7 @@ public class PlayerLoginListener implements Listener {
 
 		initializePlayerInfo(playerName);
 		countDown c = new countDown(player);
+
 		// 跳转界面判定
 		if (!playerInfo.get(playerName).get(0).equals("no")) {
 			// 已注册的场合
@@ -54,6 +55,9 @@ public class PlayerLoginListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
+                    if(player.isDead()){
+                        player.spigot().respawn();
+                    }
 					showMenu(player, LOGIN_MENU);
 					this.cancel();
 				}
@@ -71,7 +75,13 @@ public class PlayerLoginListener implements Listener {
 			}.runTaskTimer(main, 1, -1);
 		}
 	}
-	
+    @EventHandler
+    public void spawnMenu(PlayerRespawnEvent e){
+        if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
+            showMenu(e.getPlayer(),1);
+        }
+    }
+
 	/*
 	 * 阻止玩家在未登录时移动
 	 */
@@ -133,7 +143,11 @@ public class PlayerLoginListener implements Listener {
 	@EventHandler
 	public void deleteLeavePlayer(PlayerQuitEvent e) {
 		playerInfo.remove(e.getPlayer().getName());
+		if(e.getPlayer().isDead()){
+		    e.getPlayer().spigot().respawn();
+        }
 	}
+
 
 	
 	private void initializePlayerInfo(String playerName) {
@@ -358,18 +372,23 @@ public class PlayerLoginListener implements Listener {
 
 		@Override
 		public void run() {
-			if (playerInfo.get(player.getName()).get(1).equals("yes")) {
-				this.cancel();
-			} else if (timeLeft < 0) {
-				Bukkit.getScheduler().runTask(main, new Runnable() {
-					public void run() {
-						player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!");
-					}
-				});
-				this.cancel();
-			} else {
-				timeLeft--;
-			}
+		    try{
+                if (playerInfo.get(player.getName()).get(1).equals("yes")) {
+                    this.cancel();
+                } else if (timeLeft < 0) {
+                    Bukkit.getScheduler().runTask(main, new Runnable() {
+                        public void run() {
+                            player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!");
+                        }
+                    });
+                    this.cancel();
+                } else {
+                    timeLeft--;
+                }
+            }catch (Exception e){
+		        this.cancel();
+		    }
+
 		}
 	}
 }
