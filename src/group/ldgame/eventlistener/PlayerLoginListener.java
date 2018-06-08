@@ -42,11 +42,10 @@ public class PlayerLoginListener implements Listener {
 	@EventHandler
 	public void onJoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
-		player.setInvulnerable(true);
-		String playerName = player.getName();
 		
-		initializePlayerInfo(playerName);
+		String playerName = player.getName();
 
+		initializePlayerInfo(playerName);
 		countDown c = new countDown(player);
 		// 跳转界面判定
 		if (!playerInfo.get(playerName).get(0).equals("no")) {
@@ -141,7 +140,7 @@ public class PlayerLoginListener implements Listener {
 		ArrayList<String> infos = new ArrayList<>();
 		String pwEncrypt = LoginInfoUtil.getPlayerLoginInfo(playerName).get("pwEncrypt");
 		/*
-		 * 元素1 密码加密信息，未注册的直接填none
+		 * 元素1 密码加密信息，未注册的直接填no
 		 * 元素2 是否已成功进入游戏
 		 * 元素3 是否点击注册菜单
 		 */
@@ -182,8 +181,10 @@ public class PlayerLoginListener implements Listener {
 	 * 菜单界面加载
 	 */
 	public void showMenu(Player player, int MenuType) {
+		player.setInvulnerable(true);
 		String playerName = player.getName();
 		Inventory inv;
+
 		if (MenuType == CHOSE_MENU) {
 			inv = Bukkit.createInventory(null, 9, "欢迎新玩家" + playerName + "!");
 			player.openInventory(inv);
@@ -265,7 +266,6 @@ public class PlayerLoginListener implements Listener {
 							new BukkitRunnable() {
 								@Override
 								public void run() {
-									System.out.println("waoooo");
 									playerInfo.get(playerName).set(2, "yes");
 									showMenu(player, REGISTER_MENU);
 									this.cancel();
@@ -358,7 +358,7 @@ public class PlayerLoginListener implements Listener {
 
 		@Override
 		public void run() {
-			if (playerInfo.get(player.getName()).get(1).equals("no")) {
+			if (playerInfo.get(player.getName()).get(1).equals("yes")) {
 				this.cancel();
 			} else if (timeLeft < 0) {
 				Bukkit.getScheduler().runTask(main, new Runnable() {
