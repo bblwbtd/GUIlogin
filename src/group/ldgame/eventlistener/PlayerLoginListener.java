@@ -62,12 +62,13 @@ public class PlayerLoginListener implements Listener {
 			public void run() {
 
 				if (e.getInventory().getName().equals("登录") && !isJoined && player.isOnline()) {
+
 					e.getPlayer().openInventory(e.getInventory());
 				} else if (e.getInventory().getName().equals("注册") && !isJoined && player.isOnline()) {
-                    e.getPlayer().openInventory(e.getInventory());
+					showMenu(player, CHOSE_MENU);
 				} else if (e.getInventory().getName().equals("欢迎新玩家" + playerName + "!") 
 						   && !isJoined && player.isOnline() && !isClickReg) {
-                    e.getPlayer().openInventory(e.getInventory());
+					e.getPlayer().openInventory(e.getInventory());
 				}
 				this.cancel();
 			}
