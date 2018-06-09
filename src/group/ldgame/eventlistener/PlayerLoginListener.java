@@ -77,9 +77,12 @@ public class PlayerLoginListener implements Listener {
 	}
     @EventHandler
     public void spawnMenu(PlayerRespawnEvent e){
-        if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
-            showMenu(e.getPlayer(),1);
-        }
+		if(e.getPlayer() != null){
+			if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
+				showMenu(e.getPlayer(),1);
+			}
+		}
+
     }
 
 	/*
@@ -142,10 +145,7 @@ public class PlayerLoginListener implements Listener {
 	 */
 	@EventHandler
 	public void deleteLeavePlayer(PlayerQuitEvent e) {
-		playerInfo.remove(e.getPlayer().getName());
-		if(e.getPlayer().isDead()){
-		    e.getPlayer().spigot().respawn();
-        }
+		System.out.println(playerInfo.size());
 	}
 
 
