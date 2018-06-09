@@ -25,16 +25,18 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class PlayerLoginListener implements Listener {
-	public final int CHOSE_MENU = 0;
-	public final int LOGIN_MENU = 1;
-	public final int REGISTER_MENU = 2;
+	public static final int CHOSE_MENU = 0;
+	public static final int LOGIN_MENU = 1;
+	public static final int REGISTER_MENU = 2;
 
 	private Main main;
 	private TreeMap<String, ArrayList<String>> playerInfo = new TreeMap<>();
+	private boolean cmdOpenReg = false;
 
 	public PlayerLoginListener(Main m) {
 		this.main = m;
 	}
+
 	
 	/*
 	 * 判断玩家之前是否已注册
@@ -127,15 +129,21 @@ public class PlayerLoginListener implements Listener {
 	private void initializePlayerInfo(String playerName) {
 		ArrayList<String> infos = new ArrayList<>();
 		String pwEncrypt = LoginInfoUtil.getPlayerLoginInfo(playerName).get("pwEncrypt");
+		String playerExist = LoginInfoUtil.getPlayerLoginInfo(playerName).get("playerexist");
 		/*
-		 * 元素1 密码加密信息，未注册的直接填no
+		 * 元素1 密码加密信息，未注册或者密码被重置的直接填no
 		 * 元素2 是否已成功进入游戏
 		 * 元素3 是否点击注册菜单
 		 */
 
-		// 判断登录信息中的pwEncrypt是否不为空，若不为空，说明玩家已注册
-		if (!pwEncrypt.equals("")) {
-			infos.add(pwEncrypt);
+		// 判断登录信息中的playerExist是否不为空，若不为空，说明玩家已注册
+		// 判断登录信息中的pwEncrypt是否不为空，若为空，说明玩家密码被重置
+		if (!playerExist.equals("no")) {
+			if(!pwEncrypt.equals("")) {
+				infos.add(pwEncrypt);				
+			} else {
+				infos.add("no");				
+			}
 		} else {
 			infos.add("no");
 		}
@@ -209,7 +217,7 @@ public class PlayerLoginListener implements Listener {
 	public void inventoryClickEvent(InventoryClickEvent e) {
 		Player player = (Player) e.getWhoClicked();
 		String playerName = player.getName();
-		if (playerInfo.get(playerName).get(1).equals("no")) {
+		if (playerInfo.get(playerName).get(1).equals("no") || cmdOpenReg) {
 			try {
 				// 防止点击空白处产生空指针异常
 				if (e.getClickedInventory() != null) {
@@ -326,10 +334,20 @@ public class PlayerLoginListener implements Listener {
 	 * 玩家加入成功时的操作
 	 */
 	private void JoinSuccess(Player player,String extraMessage) {
-		playerInfo.get(player.getName()).set(1, "yes");
-		player.closeInventory();
-		player.sendTitle(new Title(ChatColor.RED + "欢迎来到灵动MC服务器!", ChatColor.GREEN + extraMessage));
-		player.setInvulnerable(false);
+		if(cmdOpenReg == false) {
+			playerInfo.get(player.getName()).set(1, "yes");			
+			player.closeInventory();
+			player.sendTitle(new Title(ChatColor.RED + "欢迎来到灵动MC服务器!", ChatColor.GREEN + extraMessage,10,20,10));
+			player.setInvulnerable(false);
+		} else {
+			player.closeInventory();
+			player.sendTitle(new Title(ChatColor.RED + "密码设置完成！",ChatColor.GREEN + "您已成为正式玩家/已重新设置密码",10,20,10));
+			player.setInvulnerable(false);
+		}
+	}
+	
+	public void setCmdOpenReg(boolean cmdOpenReg) {
+		this.cmdOpenReg = cmdOpenReg;
 	}
 
 	private class countDown extends BukkitRunnable {
