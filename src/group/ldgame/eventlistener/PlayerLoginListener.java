@@ -37,7 +37,9 @@ public class PlayerLoginListener implements Listener {
 	}
 	
 	/*
-	 * 判断玩家之前是否已注册 未注册玩家跳转至注册、试玩选择界面 注册玩家跳转至登录界面
+	 * 判断玩家之前是否已注册
+	 * 未注册玩家跳转至注册、试玩选择界面
+	 * 注册玩家跳转至登录界面
 	 */
 	@EventHandler
 	public void onJoin(PlayerLoginEvent e) {
@@ -47,9 +49,6 @@ public class PlayerLoginListener implements Listener {
 
 		initializePlayerInfo(playerName);
 		countDown c = new countDown(player);
-		if(player.isDead()){
-			player.spigot().respawn();
-		}
 		// 跳转界面判定
 		if (!playerInfo.get(playerName).get(0).equals("no")) {
 			// 已注册的场合
@@ -57,7 +56,9 @@ public class PlayerLoginListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-
+					if(player.isDead()){
+						player.spigot().respawn();
+					}
 					showMenu(player, LOGIN_MENU);
 					this.cancel();
 				}
@@ -69,29 +70,13 @@ public class PlayerLoginListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
+					if(player.isDead()){
+						player.spigot().respawn();
+					}
 					showMenu(player, CHOSE_MENU);
 					this.cancel();
 				}
 			}.runTaskTimer(main, 1, -1);
-		}
-	}
-    @EventHandler
-    public void spawnMenu(PlayerRespawnEvent e){
-		if(e.getPlayer() != null){
-			if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
-				showMenu(e.getPlayer(),1);
-			}
-		}
-
-    }
-
-	/*
-	 * 阻止玩家在未登录时移动
-	 */
-	@EventHandler
-	public void avoidMove(PlayerMoveEvent e) {
-		if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
-			e.setCancelled(true);
 		}
 	}
 
@@ -106,13 +91,12 @@ public class PlayerLoginListener implements Listener {
 			@Override
 			public void run() {
 				if(player.isOnline() && playerInfo.get(playerName).get(1).equals("no")) {
-					if (e.getInventory().getName().equals("登录")) {
+					if (!e.getInventory().getName().equals("欢迎新玩家" + playerName + "!")) {
 						player.openInventory(e.getInventory());
-					} else if (e.getInventory().getName().equals("注册")) {
-						showMenu(player, CHOSE_MENU);
-					} else if (e.getInventory().getName().equals("欢迎新玩家" + playerName + "!") 
-								&& playerInfo.get(playerName).get(2).equals("no")) {
-						player.openInventory(e.getInventory());
+					}else {
+						if(playerInfo.get(playerName).get(2).equals("no")) {
+							showMenu(player, CHOSE_MENU);												
+						}
 					}
 				}
 				this.cancel();
@@ -139,16 +123,6 @@ public class PlayerLoginListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
-
-	/*
-	 * 在玩家退出时，将玩家信息移除
-	 */
-	@EventHandler
-	public void deleteLeavePlayer(PlayerQuitEvent e) {
-		System.out.println(playerInfo.size());
-	}
-
-
 	
 	private void initializePlayerInfo(String playerName) {
 		ArrayList<String> infos = new ArrayList<>();
