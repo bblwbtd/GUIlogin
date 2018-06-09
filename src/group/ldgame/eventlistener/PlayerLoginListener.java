@@ -47,7 +47,9 @@ public class PlayerLoginListener implements Listener {
 
 		initializePlayerInfo(playerName);
 		countDown c = new countDown(player);
-
+		if(player.isDead()){
+			player.spigot().respawn();
+		}
 		// 跳转界面判定
 		if (!playerInfo.get(playerName).get(0).equals("no")) {
 			// 已注册的场合
@@ -55,9 +57,7 @@ public class PlayerLoginListener implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-                    if(player.isDead()){
-                        player.spigot().respawn();
-                    }
+
 					showMenu(player, LOGIN_MENU);
 					this.cancel();
 				}
