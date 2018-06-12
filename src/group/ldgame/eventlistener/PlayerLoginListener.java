@@ -92,6 +92,7 @@ public class PlayerLoginListener implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+				System.out.println(playerName);
 				if(player.isOnline() && playerInfo.get(playerName).get(1).equals("no")) {
 					if (!e.getInventory().getName().equals("欢迎新玩家" + playerName + "!")) {
 						player.openInventory(e.getInventory());
@@ -115,7 +116,15 @@ public class PlayerLoginListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
-
+	/*
+	* 阻止玩家移动
+	* */
+	@EventHandler
+	public void avoidMove(PlayerMoveEvent e){
+		if (playerInfo.get(e.getPlayer().getName()).get(1).equals("no")) {
+			e.setCancelled(true);
+		}
+	}
 	/*
 	 * 阻止玩家在未登录时掉落
 	 */
