@@ -8,15 +8,21 @@ import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import group.ldgame.command.PluginCommand;
+import group.ldgame.eventlistener.MenuListener;
 import group.ldgame.eventlistener.PlayerLoginListener;
 
 public class Main extends JavaPlugin {
 	private PlayerLoginListener pll;
+	private MenuListener ml;
     @Override
     public void onEnable() {
-    	pll = new PlayerLoginListener(this);
+    	ml = new MenuListener(this);
+    	pll = new PlayerLoginListener(this,ml);
+    	
+    	getServer().getPluginManager().registerEvents(ml,this);
     	getServer().getPluginManager().registerEvents(pll,this);
-    	this.getCommand("guilogin").setExecutor(new PluginCommand(pll));
+    	
+    	this.getCommand("guilogin").setExecutor(new PluginCommand(ml));
 
 		try {
             File pwFile = new File("plugins/GUIlogin/");

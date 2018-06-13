@@ -6,14 +6,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import group.ldgame.eventlistener.PlayerLoginListener;
+
+import group.ldgame.eventlistener.MenuListener;
 import group.ldgame.login.LoginInfoUtil;
 
 public class PluginCommand implements CommandExecutor {
-	private PlayerLoginListener pll;
+	private MenuListener menuListener;
 	
-	public PluginCommand(PlayerLoginListener pll) {
-		this.pll = pll;
+	public PluginCommand(MenuListener menuListener) {
+		this.menuListener = menuListener;
 	}
 	
 	@Override
@@ -38,16 +39,16 @@ public class PluginCommand implements CommandExecutor {
             			//正常玩家 或者是 被重置了密码然后点了试玩的玩家会进入
             			if(playerInfo.get("pwEncrypt").equals("")) {
         					//配置文件中玩家加密信息为空
-            				pll.setCmdOpenReg(true);
-                			pll.showMenu(player, PlayerLoginListener.REGISTER_MENU);
+            				menuListener.setCmdOpenReg(true);
+            				menuListener.showMenu(player, MenuListener.REGISTER_MENU);
                 			return true;
         				} else {
         					sender.sendMessage("您已经是正式玩家/密码未被重置");            			        					
         					return true;
         				}
             		} else {
-            			pll.setCmdOpenReg(true);
-            			pll.showMenu(player, PlayerLoginListener.REGISTER_MENU);
+            			menuListener.setCmdOpenReg(true);
+            			menuListener.showMenu(player, MenuListener.REGISTER_MENU);
             			return true;
             		}
             	}
