@@ -23,7 +23,7 @@ public class PlayerLoginListener implements Listener {
 
 	private Main main;
 	private MenuListener menuListener;
-	public static TreeMap<String, ArrayList<String>> playerInfo = new TreeMap<>();
+	protected static TreeMap<String, ArrayList<String>> playerInfo = new TreeMap<>();
 
 	public PlayerLoginListener(Main m,MenuListener menuListener) {
 		this.main = m;
