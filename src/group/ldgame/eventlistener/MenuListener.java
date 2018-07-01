@@ -116,7 +116,7 @@ public class MenuListener implements Listener {
 						// 新玩家界面处理代码
 					} else {
 						if (e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "试玩")) {
-							JoinSuccess(player,"游玩快乐！");
+							JoinSuccess(player, (String) Main.yamlConfiguration.get("try","试玩愉快!别忘了设置密码哟!"));
 							e.setCancelled(true);
 						}
 						if (e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "注册")) {
@@ -200,7 +200,7 @@ public class MenuListener implements Listener {
 
 			if (isPass) {
 				// 密码输入正确的场合
-				JoinSuccess(player,"登录成功!");
+				JoinSuccess(player,(String) Main.yamlConfiguration.get("welcome_message2","登录成功"));
 			} else {
 				// 密码输入错误的场合
 				e.setCurrentItem(
@@ -209,7 +209,7 @@ public class MenuListener implements Listener {
 			// 注册界面的处理
 		} else if (e.getClickedInventory().getName().equals("注册")) {
 			LoginInfoUtil.registerPlayerInfo(player.getName(), password.toString());
-			JoinSuccess(player,"注册成功!");
+			JoinSuccess(player,(String) Main.yamlConfiguration.get("signup_success","注册成功!"));
 		}
 	}
 	
@@ -217,14 +217,14 @@ public class MenuListener implements Listener {
 	 * 玩家加入成功时的操作
 	 */
 	private void JoinSuccess(Player player,String extraMessage) {
-		if(cmdOpenReg == false) {
+		if(!cmdOpenReg) {
 			PlayerLoginListener.playerInfo.get(player.getName()).set(1, "yes");			
 			player.closeInventory();
-			player.sendTitle(new Title(ChatColor.RED + "欢迎来到灵动MC服务器!", ChatColor.GREEN + extraMessage,10,20,10));
+			player.sendTitle(new Title(ChatColor.RED + (String) Main.yamlConfiguration.get("welcome_message","欢迎来到灵动MC服务器!"), ChatColor.GREEN + extraMessage,10,20,10));
 			player.setInvulnerable(false);
 		} else {
 			player.closeInventory();
-			player.sendTitle(new Title(ChatColor.RED + "密码设置完成！",ChatColor.GREEN + "您已成为正式玩家/已重新设置密码",10,20,10));
+			player.sendTitle(new Title(ChatColor.RED + (String) Main.yamlConfiguration.get("set_message","密码设置完成！"),ChatColor.GREEN + "您已成为正式玩家/已重新设置密码",10,20,10));
 			player.setInvulnerable(false);
 			cmdOpenReg = false;
 		}

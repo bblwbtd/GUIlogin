@@ -30,7 +30,7 @@ public class PlayerLoginListener implements Listener {
 		this.menuListener = menuListener;
 	}
 
-	
+
 	/*
 	 * 判断玩家之前是否已注册
 	 * 未注册玩家跳转至注册、试玩选择界面
@@ -39,7 +39,7 @@ public class PlayerLoginListener implements Listener {
 	@EventHandler
 	public void onJoin(PlayerLoginEvent e) {
 		Player player = e.getPlayer();
-		
+
 		String playerName = player.getName();
 
 		initializePlayerInfo(playerName);
@@ -90,7 +90,7 @@ public class PlayerLoginListener implements Listener {
 						player.openInventory(e.getInventory());
 					}else {
 						if(playerInfo.get(playerName).get(2).equals("no")) {
-							menuListener.showMenu(player, MenuListener.CHOSE_MENU);												
+							menuListener.showMenu(player, MenuListener.CHOSE_MENU);
 						}
 					}
 				}
@@ -126,7 +126,7 @@ public class PlayerLoginListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
-	
+
 	private void initializePlayerInfo(String playerName) {
 		ArrayList<String> infos = new ArrayList<>();
 		String pwEncrypt = LoginInfoUtil.getPlayerLoginInfo(playerName).get("pwEncrypt");
@@ -141,9 +141,9 @@ public class PlayerLoginListener implements Listener {
 		// 判断登录信息中的pwEncrypt是否不为空，若为空，说明玩家密码被重置
 		if (!playerExist.equals("no")) {
 			if(!pwEncrypt.equals("")) {
-				infos.add(pwEncrypt);				
+				infos.add(pwEncrypt);
 			} else {
-				infos.add("no");				
+				infos.add("no");
 			}
 		} else {
 			infos.add("no");
@@ -152,7 +152,7 @@ public class PlayerLoginListener implements Listener {
 		infos.add("no");
 		playerInfo.put(playerName, infos);
 	}
-	
+
 	private class countDown extends BukkitRunnable {
 		private int timeLeft = 60;
 		private Player player;
@@ -171,11 +171,7 @@ public class PlayerLoginListener implements Listener {
                 if (playerInfo.get(player.getName()).get(1).equals("yes")) {
                     this.cancel();
                 } else if (timeLeft < 0) {
-                    Bukkit.getScheduler().runTask(main, new Runnable() {
-                        public void run() {
-                            player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!");
-                        }
-                    });
+                    Bukkit.getScheduler().runTask(main, () -> player.kickPlayer(ChatColor.RED + "" + ChatColor.BOLD + "timemout!"));
                     this.cancel();
                 } else {
                     timeLeft--;
